@@ -41,6 +41,18 @@ class couchbase::install (
     }
 
   case $method {
+    'url': {
+      if $couchbase::package_url {
+        package {'couchbase-server-community':
+          ensure   => installed,
+          provider => 'rpm',
+          source   => $couchbase::package_url,
+        }
+      } else {
+        fail ("${module_name} you picked 'url' as installation methond but
+          package_url variable is empty")
+      }
+    }
     'curl': {
       exec { 'download_couchbase':
         command => "curl -o /opt/${pkgname} ${pkgsource}",
@@ -63,7 +75,7 @@ class couchbase::install (
       }
     }
     default: {
-      fail ("${module_name} install_method must be 'package' or 'curl'")
+      fail ("${module_name} install_method must be 'package', 'url' or 'curl'")
     }
   }
 
@@ -80,7 +92,7 @@ class couchbase::install (
     }
   }
 
-  if ! defined(Package["${::couchbase::params::openssl_package}"]) {
+  if ! defined(Package[$::couchbase::params::openssl_package]) {
     ensure_packages($::couchbase::params::openssl_package)
   }
 

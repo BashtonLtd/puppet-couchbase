@@ -23,7 +23,7 @@
 # [*server_group*]
 # The group in which this couchbase server will live. Set to 'default'
 # [*install_method*]
-#  The method used to install the couchbase server. Can be either curl
+#  The method used to install the couchbase server. Can be either url, curl
 #  or package
 # [*autofailover*]
 #  Should the cluster autofailover
@@ -68,8 +68,9 @@ class couchbase
   $install_method    = 'curl',
   $autofailover      = $::couchbase::params::autofailover,
   $data_dir          = $::couchbase::params::data_dir,
-  $index_dir        = undef,
+  $index_dir         = undef,
   $download_url_base = $::couchbase::params::download_url_base,
+  $package_url       = undef,
 ) inherits ::couchbase::params {
 
   validate_numeric($size)
@@ -79,7 +80,7 @@ class couchbase
   validate_string($edition)
   validate_string($nodename)
   validate_string($server_group)
-  validate_re($install_method, ['curl', 'package'])
+  validate_re($install_method, ['curl', 'package', 'url'])
   validate_string($ensure)
   validate_bool($autofailover)
   validate_absolute_path($data_dir)
@@ -87,6 +88,7 @@ class couchbase
     validate_absolute_path($index_dir)
   }
   validate_string($download_url_base)
+  validate_string($package_url)
 
   # Define initialized node as a couchbase node (This will always be true
   # so this is a safe assumption to make.
@@ -105,34 +107,21 @@ class couchbase
     }
 
     Anchor['couchbase::begin'] ->
-
     class {'::couchbase::install':
       version  => $version,
       edition  => $edition,
       data_dir => $data_dir,
-    }
-
-    ->
-
-    class {'::couchbase::service':}
-
-    ->
-
+    } ->
+    class {'::couchbase::service':} ->
     class {'::couchbase::config':
       size         => $size,
       user         => $user,
       password     => $password,
       server_group => $server_group,
       autofailover => $autofailover,
-    }
-
-    ->
-
+    } ->
     Anchor['couchbase::end']
-
-  }
-  elsif $ensure == absent {
-
+  } elsif $ensure == absent {
     # Removing node init lock.
     file {$::couchbase::params::node_init_lock:
       ensure => absent,
@@ -144,26 +133,18 @@ class couchbase
     }
 
     Anchor['couchbase::begin'] ->
-
     class {'::couchbase::install':
       version           => $version,
       edition           => $edition,
       download_url_base => $download_url_base,
-    }
-
-    ->
-
+    } ->
     class {'::couchbase::config':
       ensure       => $ensure,
       size         => $size,
       user         => $user,
       password     => $password,
       server_group => $server_group,
-    }
-
-    ->
-
+    } ->
     Anchor['couchbase::end']
   }
-
 }
