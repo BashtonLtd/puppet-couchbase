@@ -30,11 +30,11 @@ class couchbase::params {
   case $::osfamily {
     /(?i:centos|redhat|scientific)/: {
       if versioncmp($::operatingsystemmajrelease, '7') >= 0  {
-        $openssl_package     = ['openssl-libs']
-        $osname              = "centos7"
+        $openssl_package     = 'openssl'
+        $osname              = 'centos7'
       } else {
-        $openssl_package     = ['openssl098e']
-        $osname              = "centos6"
+        $openssl_package     = 'openssl098e'
+        $osname              = 'centos6'
       }
       $installer           = 'rpm'
       $pkgtype             = 'rpm'
@@ -44,13 +44,14 @@ class couchbase::params {
       $pkgverspacer        = '-'
     }
     'Debian': {
-      $openssl_package = ['openssl']
-      $installer       = 'dpkg'
-      $pkgtype         = 'deb'
+      $openssl_package     = 'openssl'
+      $installer           = 'dpkg'
+      $pkgtype             = 'deb'
       $development_package = 'libcouchbase-dev'
-      $repository      = 'debian'
-      $pkgarch         = '_amd64'
-      $pkgverspacer    = '_'
+      $repository          = 'debian'
+      $pkgarch             = '_amd64'
+      $pkgverspacer        = '_'
+
       case $::operatingsystem {
         'Debian': {
           $osname = 'debian7'
@@ -65,7 +66,7 @@ class couchbase::params {
             }
           }
         }
-        default: { }
+        default: {}
       }
     }
     default: {

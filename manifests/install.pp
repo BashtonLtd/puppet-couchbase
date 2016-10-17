@@ -47,6 +47,7 @@ class couchbase::install (
           ensure   => installed,
           provider => 'rpm',
           source   => $couchbase::package_url,
+          require  => Package[$::couchbase::params::openssl_package],
         }
       } else {
         fail ("${module_name} you picked 'url' as installation methond but
@@ -96,7 +97,6 @@ class couchbase::install (
     ensure_packages($::couchbase::params::openssl_package)
   }
 
-
   # Ensure data directory is configured properly
   file {$data_dir:
     ensure  => directory,
@@ -104,5 +104,4 @@ class couchbase::install (
     owner   => 'couchbase',
     require => Package[$pkg_package],
   }
-
 }

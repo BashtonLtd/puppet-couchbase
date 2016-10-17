@@ -55,7 +55,7 @@ define couchbase::bucket (
 
   include ::couchbase::params
 
-  if $::couchbase::ensure == present {
+  if $couchbase::ensure == present {
     # all this has to be done before we can create buckets.
     Class['couchbase::install'] -> Couchbase::Bucket[$title]
     Class['couchbase::config'] -> Couchbase::Bucket[$title]
